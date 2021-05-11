@@ -5,26 +5,27 @@ build:
 create-project:
 	@make build
 	@make up
-	docker-compose exec php php artisan key:generate
-	docker-compose exec php php artisan storage:link
-	docker-compose exec php chmod -R 777 storage bootstrap/cache
+	docker-compose exec api php artisan key:generate
+	docker-compose exec api php artisan storage:link
+	docker-compose exec api chmod -R 777 storage bootstrap/cache
 	@make fresh
 install-recommend-packages:
-	docker-compose exec php composer require doctrine/dbal "^2"
-	docker-compose exec php composer require --dev ucan-lab/laravel-dacapo
-	docker-compose exec php composer require --dev barryvdh/laravel-ide-helper
-	docker-compose exec php composer require --dev beyondcode/laravel-dump-server
-	docker-compose exec php composer require --dev barryvdh/laravel-debugbar
-	docker-compose exec php composer require --dev roave/security-advisories:dev-master
-	docker-compose exec php php artisan vendor:publish --provider="BeyondCode\DumpServer\DumpServerServiceProvider"
-	docker-compose exec php php artisan vendor:publish --provider="Barryvdh\Debugbar\ServiceProvider"
+	docker-compose exec api composer require doctrine/dbal "^2"
+	docker-compose exec api composer require --dev ucan-lab/laravel-dacapo
+	docker-compose exec api composer require --dev barryvdh/laravel-ide-helper
+	docker-compose exec api composer require --dev beyondcode/laravel-dump-server
+	docker-compose exec api composer require --dev barryvdh/laravel-debugbar
+	docker-compose exec api composer require --dev roave/security-advisories:dev-master
+	docker-compose exec api php artisan vendor:publish --provider="BeyondCode\DumpServer\DumpServerServiceProvider"
+	docker-compose exec api php artisan vendor:publish --provider="Barryvdh\Debugbar\ServiceProvider"
 init:
+	cp .env.example .env
 	docker-compose up -d --build
-	docker-compose exec php composer install
-	docker-compose exec php cp .env.example .env
-	docker-compose exec php php artisan key:generate
-	docker-compose exec php php artisan storage:link
-	docker-compose exec php chmod -R 777 storage bootstrap/cache
+	docker-compose exec api composer install
+	docker-compose exec api cp .env.example .env
+	docker-compose exec api php artisan key:generate
+	docker-compose exec api php artisan storage:link
+	docker-compose exec api chmod -R 777 storage bootstrap/cache
 	@make fresh
 remake:
 	@make destroy
@@ -58,21 +59,17 @@ log-db:
 	docker-compose logs db
 log-db-watch:
 	docker-compose logs --follow db
-web:
-	docker-compose exec web bash
-app:
-	docker-compose exec app bash
 migrate:
-	docker-compose exec app php artisan migrate
+	docker-compose exec api php artisan migrate
 fresh:
-	docker-compose exec app php artisan migrate:fresh --seed
+	docker-compose exec api php artisan migrate:fresh --seed
 seed:
-	docker-compose exec app php artisan db:seed
+	docker-compose exec api php artisan db:seed
 dacapo:
-	docker-compose exec app php artisan dacapo
+	docker-compose exec api php artisan dacapo
 rollback-test:
-	docker-compose exec app php artisan migrate:fresh
-	docker-compose exec app php artisan migrate:refresh
+	docker-compose exec api php artisan migrate:fresh
+	docker-compose exec api php artisan migrate:refresh
 tinker:
 	docker-compose exec api php artisan tinker
 test:
@@ -92,36 +89,24 @@ cache-clear:
 	docker-compose exec api php artisan event:clear
 npm:
 	@make npm-install
-npm-install:
-	docker-compose exec web npm install
-npm-dev:
-	docker-compose exec web npm run dev
-npm-watch:
-	docker-compose exec web npm run watch
-npm-watch-poll:
-	docker-compose exec web npm run watch-poll
-npm-hot:
-	docker-compose exec web npm run hot
 yarn:
-	docker-compose exec web yarn
+	docker-compose exec front yarn
 yarn-install:
 	@make yarn
 yarn-dev:
-	docker-compose exec nginx yarn dev
+	docker-compose exec front yarn dev
 yarn-watch:
-	docker-compose exec web yarn watch
+	docker-compose exec front yarn watch
 yarn-watch-poll:
-	docker-compose exec web yarn watch-poll
+	docker-compose exec front yarn watch-poll
 yarn-hot:
-	docker-compose exec web yarn hot
+	docker-compose exec front yarn hot
 db:
 	docker-compose exec db bash
 sql:
 	docker-compose exec db bash -c 'mysql -u $$MYSQL_USER -p$$MYSQL_PASSWORD $$MYSQL_DATABASE'
-redis:
-	docker-compose exec redis redis-cli
 ide-helper:
-	docker-compose exec app php artisan clear-compiled
-	docker-compose exec app php artisan ide-helper:generate
-	docker-compose exec app php artisan ide-helper:meta
-	docker-compose exec app php artisan ide-helper:models --nowrite
+	docker-compose exec api php artisan clear-compiled
+	docker-compose exec api php artisan ide-helper:generate
+	docker-compose exec api php artisan ide-helper:meta
+	docker-compose exec api php artisan ide-helper:models --nowrite

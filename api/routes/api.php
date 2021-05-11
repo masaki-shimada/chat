@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ChatController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,3 +23,9 @@ Route::get('/health', function () {
     return 'ok';
 });
 
+Route::get('/chat/', [ChatController::class, 'index']);
+Route::get('/chat/room/{user_id}', [ChatController::class, 'room']);
+Route::get('/chat/list', [ChatController::class, 'list']);
+Route::get('/chat/users', [ChatController::class, 'getUsers']);
+Route::get('/chat/messages', [ChatController::class, 'fetchMessages']);
+Route::post('/chat/messages', [ChatController::class, 'sendMessage']);
